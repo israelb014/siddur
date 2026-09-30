@@ -145,6 +145,10 @@ var Engine = (function () {
     f.tamuz17 = mi === 10 && ((d === 17 && dow !== 6) || (d === 18 && dow === 0));
     f.av9 = mi === 11 && ((d === 9 && dow !== 6) || (d === 10 && dow === 0));
     f.fast = f.gedalia || f.tevet10 || f.esther || f.tamuz17 || f.av9;
+    // Yom HaAtzmaut (5 Iyar; Fri/Sat -> Thu, Mon -> Tue) and Yom Yerushalayim (28 Iyar): no Tachanun, nothing else changes
+    var dow5 = ((dow + 5 - d) % 7 + 7) % 7;
+    f.yomHaatzmaut = mi === 8 && d === (dow5 === 5 ? 4 : dow5 === 6 ? 3 : dow5 === 1 ? 6 : 5);
+    f.yomYerushalayim = mi === 8 && d === 28;
     f.ayt = mi === 1 && d >= 3 && d <= 9;
     f.geshem = (mi === 1 && d >= 22) || (mi >= 2 && mi <= 6.5) || (mi === 7 && d < 15);
     f.tal = !f.geshem;
@@ -160,7 +164,7 @@ var Engine = (function () {
     f.leap = h.leap && mi <= 6.5;
     f.tachanun = !(f.shabbat || f.yt || f.rc || f.ch || f.chanukah || mi === 7 || (mi === 1 && (d <= 2 || d >= 9)) ||
       (mi === 12 && d === 29) || f.purim || f.shushan || (M === "Adar I" && (d === 14 || d === 15)) || (mi === 5 && d === 15) ||
-      (mi === 8 && (d === 14 || d === 18)) || (mi === 9 && d <= 12) || f.av9 || (mi === 11 && d === 15));
+      (mi === 8 && (d === 14 || d === 18)) || f.yomHaatzmaut || f.yomYerushalayim || (mi === 9 && d <= 12) || f.av9 || (mi === 11 && d === 15));
     f.monthu = dow === 1 || dow === 4;
     f.tefillin = !(f.ch || f.av9 || f.shabbat || f.yt);
     f.omer = 0;
