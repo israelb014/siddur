@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>סידור יומי</title>
+<meta name="description" content="סידור בנוסח עדות המזרח שמתאים את עצמו לתאריך העברי ולזמני היום.">
+<meta name="theme-color" content="#0c1222">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="סידור יומי">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@400;500;700;900&family=Assistant:wght@400;600;700;800&display=swap">
+<style>
+/* Layout: one reading column. Sticky bar (progress ring, prayer name, chips); controls and day cards above the text. */
+:root{
+  --bg:#f2f5fb; --surface:#ffffff; --surface2:#eef2fa; --fg:#131a2c; --muted:#5b6682; --line:#dde3ef;
+  --accent:#1f4fa8; --accent-soft:#e2eafa; --on-accent:#ffffff;
+  --glow:rgba(255,190,110,.42); --glow2:rgba(80,130,230,.16);
+  --cue:#8a5a12; --cue-bg:#fbf0dc; --ok:#1f7a4a; --warn:#b4411f;
+  --f-text:"Frank Ruhl Libre","David Libre","Times New Roman",serif;
+  --f-ui:"Assistant","Segoe UI",Arial,sans-serif;
+  --r:20px; --fs:1.4rem;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0c1222; --surface:#141b2f; --surface2:#1a2340; --fg:#eef1f8; --muted:#98a3bf; --line:#242e4a;
+  --accent:#92b4ff; --accent-soft:#1c2850; --on-accent:#0c1222;
+  --glow:rgba(255,165,80,.15); --glow2:rgba(90,130,255,.16);
+  --cue:#f1c47e; --cue-bg:#2a2214; --ok:#6fd49c; --warn:#ff9a7a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0c1222; --surface:#141b2f; --surface2:#1a2340; --fg:#eef1f8; --muted:#98a3bf; --line:#242e4a;
+  --accent:#92b4ff; --accent-soft:#1c2850; --on-accent:#0c1222;
+  --glow:rgba(255,165,80,.15); --glow2:rgba(90,130,255,.16);
+  --cue:#f1c47e; --cue-bg:#2a2214; --ok:#6fd49c; --warn:#ff9a7a; color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-padding-top:130px;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--f-ui);
+  background-image:radial-gradient(90% 50% at 50% -10%,var(--glow),transparent 70%),radial-gradient(60% 40% at 100% 25%,var(--glow2),transparent 70%);
+  background-attachment:fixed;background-repeat:no-repeat;min-height:100vh}
+[hidden]{display:none!important}
+.wrap{max-width:740px;margin:0 auto;padding-inline:16px;padding-block:0 90px}
+svg{display:block}
+button{font-family:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:10px}
+
+/* bar */
+.bar{position:sticky;top:0;z-index:20;margin-inline:-16px;padding:calc(env(safe-area-inset-top,0px) + 10px) 16px 8px;
+  background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.bar-row{display:flex;align-items:center;gap:10px}
+.ring{position:relative;width:46px;height:46px;flex:none}
+.ring svg{transform:rotate(-90deg)}
+.trk{stroke:var(--line)} .val{stroke:var(--accent);transition:stroke-dashoffset .25s ease}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;font-size:.7rem;font-weight:800;font-variant-numeric:tabular-nums}
+.bar-title{flex:1;min-width:0}
+.bar-title strong{display:block;font-size:1.15rem;font-weight:800;line-height:1.15}
+.bar-title span{font-size:.84rem;color:var(--muted)}
+.icon-btn{width:40px;height:40px;border-radius:13px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;flex:none}
+.icon-btn:active{transform:scale(.94)}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-top:8px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chips a{flex:none;text-decoration:none;color:var(--muted);font-weight:700;font-size:.88rem;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:var(--surface);transition:background .2s,color .2s}
+.chips a.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+
+/* hero + controls */
+.hero{padding-block:24px 4px}
+.eyebrow{font-weight:700;color:var(--muted);font-size:.95rem;letter-spacing:.01em}
+.hero h1{font-family:var(--f-text);font-weight:900;font-size:clamp(2.8rem,12vw,4.2rem);line-height:1;margin:6px 0 0}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:4px;background:var(--surface2);border:1px solid var(--line);border-radius:16px;padding:4px;margin-top:16px}
+.seg button{border:0;background:transparent;border-radius:12px;padding:10px 6px;font-weight:800;font-size:1rem;color:var(--muted);position:relative;line-height:1.2}
+.seg button small{display:block;font-weight:600;font-size:.76rem;margin-top:2px;font-variant-numeric:tabular-nums}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.seg .now-dot{position:absolute;top:8px;left:10px;width:7px;height:7px;border-radius:50%;background:var(--ok)}
+.lvl-lbl{margin:14px 2px 0;font-size:.85rem;font-weight:700;color:var(--muted)}
+.lvl-lbl + .seg{margin-top:6px}
+
+/* cards */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-top:14px;animation:rise .45s ease both}
+.card h3{margin:0 0 10px;font-size:1rem;font-weight:800;display:flex;align-items:center;gap:8px}
+.now{display:flex;gap:16px;align-items:center}
+.cd{position:relative;width:92px;height:92px;flex:none}
+.cd svg{transform:rotate(-90deg)}
+.cd .val{stroke:var(--accent)} .cd.warn .val{stroke:var(--warn)}
+.cd div{position:absolute;inset:0;display:grid;place-items:center;text-align:center;line-height:1.05}
+.cd b{font-size:1.25rem;font-weight:800;font-variant-numeric:tabular-nums}
+.cd span{display:block;font-size:.7rem;color:var(--muted);font-weight:700}
+.now-txt{min-width:0}
+.now-txt strong{display:block;font-size:1.1rem;font-weight:800}
+.now-txt p{margin:4px 0 0;color:var(--muted);font-size:.93rem;line-height:1.5}
+details.z{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
+details.z summary{cursor:pointer;font-weight:700;font-size:.92rem;color:var(--accent);list-style:none;display:flex;align-items:center;gap:6px}
+details.z summary::-webkit-details-marker{display:none}
+details.z[open] summary svg{transform:rotate(180deg)}
+.ztable{display:grid;grid-template-columns:1fr auto;gap:6px 12px;margin-top:10px;font-size:.95rem}
+.ztable span:nth-child(even){font-variant-numeric:tabular-nums;font-weight:700;text-align:left}
+.ztable .past{color:var(--muted);opacity:.6}
+.ztable .next{color:var(--accent);font-weight:800}
+.znote{font-size:.8rem;color:var(--muted);margin:10px 0 0;line-height:1.5}
+.today-list{display:grid;gap:9px;margin:0;padding:0;list-style:none}
+.today-list li{display:flex;gap:10px;align-items:flex-start;line-height:1.5}
+.today-list li svg{flex:none;margin-top:3px;color:var(--accent)}
+.today-list li.warn svg{color:var(--warn)}
+
+/* prayer text */
+.prayer{margin-top:10px}
+.part{padding-top:30px}
+.part-h{margin:0 0 12px;font-family:var(--f-text);font-weight:900;font-size:1.95rem;line-height:1.15;display:flex;align-items:center;gap:10px}
+.part-h::after{content:"";flex:1;height:1px;background:var(--line)}
+.t{font-family:var(--f-text);font-size:var(--fs);line-height:1.9;font-weight:500;margin:0 0 .75em}
+.t b{font-weight:900;color:var(--accent)}
+.note{font-family:var(--f-ui);font-size:.66em;font-weight:600;color:var(--cue);background:var(--cue-bg);border-radius:8px;padding:1px 7px;margin-inline:2px;box-decoration-break:clone;-webkit-box-decoration-break:clone;line-height:1.9}
+.only-note{line-height:1.5}
+.only-note .note{font-size:.62em}
+.opt{color:var(--muted);font-size:.9em}
+.alt{background:var(--accent-soft);border-radius:7px;padding:0 5px;box-decoration-break:clone;-webkit-box-decoration-break:clone}
+.alt[data-when^="!"]{background:none;padding:0}
+.showall .alt::before{content:"[" attr(data-label) "] ";font-family:var(--f-ui);font-size:.6em;font-weight:800;color:var(--accent)}
+.showall .alt[data-when^="!"]{background:var(--accent-soft);padding:0 5px}
+.cue{display:flex;gap:8px;align-items:flex-start;font-size:.95rem;font-weight:600;line-height:1.5;color:var(--cue);background:var(--cue-bg);border-radius:14px;padding:9px 12px;margin:0 0 1em}
+.cue svg{flex:none;margin-top:2px}
+.t[data-when]:not([data-when=""]){position:relative}
+.showall .t[data-when]{border-inline-start:3px solid var(--accent);padding-inline-start:10px}
+
+/* done */
+.done{text-align:center}
+.week{display:flex;justify-content:center;gap:8px;margin:12px 0 4px;flex-wrap:wrap}
+.wd{display:grid;justify-items:center;gap:4px;font-size:.76rem;color:var(--muted);font-weight:700}
+.wd.today{color:var(--fg)}
+.arc{stroke:var(--line)} .arc.on{stroke:var(--ok)}
+.legend{display:flex;justify-content:center;gap:14px;font-size:.8rem;color:var(--muted);margin-top:6px}
+.cta{margin-top:14px;border:0;border-radius:15px;background:var(--accent);color:var(--on-accent);font-weight:800;font-size:1.05rem;padding:14px 22px;display:inline-flex;gap:8px;align-items:center}
+.cta[disabled]{opacity:.5;cursor:default}
+.foot{color:var(--muted);font-size:.84rem;line-height:1.6;margin-top:18px}
+.foot a{color:var(--accent)}
+
+/* settings sheet */
+.scrim{position:fixed;inset:0;background:rgba(5,10,25,.45);z-index:40;animation:fade .2s ease both}
+.sheet{position:fixed;inset-inline:0;bottom:0;z-index:41;background:var(--surface);border-radius:24px 24px 0 0;padding:10px 20px calc(24px + env(safe-area-inset-bottom,0px));max-width:740px;margin:0 auto;animation:up .28s cubic-bezier(.2,.8,.2,1) both;box-shadow:0 -10px 40px rgba(0,0,0,.25)}
+.grab{width:44px;height:5px;border-radius:9px;background:var(--line);margin:0 auto 14px}
+.sheet h3{margin:0 0 8px;font-size:1.2rem;font-weight:800}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}
+.row:last-of-type{border-bottom:0}
+.row label{font-weight:700}
+.row small{display:block;color:var(--muted);font-weight:500;font-size:.84rem;margin-top:2px}
+.sw{position:relative;width:48px;height:28px;border-radius:99px;background:var(--line);border:0;flex:none;transition:background .2s}
+.sw::after{content:"";position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s}
+.sw[aria-pressed="true"]{background:var(--accent)}
+.sw[aria-pressed="true"]::after{transform:translateX(-20px)}
+.seg.small{margin-top:0;width:190px}
+.seg.small button{padding:7px 4px;font-size:.88rem}
+
+@keyframes rise{from{opacity:.001;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes up{from{transform:translateY(100%)}to{transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="bar">
+    <div class="bar-row">
+      <div class="ring" aria-hidden="true">
+        <svg width="46" height="46" viewBox="0 0 46 46"><circle class="trk" cx="23" cy="23" r="19" fill="none" stroke-width="5"/><circle class="val" id="ringVal" cx="23" cy="23" r="19" fill="none" stroke-width="5" stroke-linecap="round" stroke-dasharray="119.38" stroke-dashoffset="119.38"/></svg>
+        <b id="ringTxt">0%</b>
+      </div>
+      <div class="bar-title"><strong id="barName">שחרית</strong><span id="barSub">—</span></div>
+      <button class="icon-btn" id="fsDown" aria-label="הקטנת טקסט"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"/></svg></button>
+      <button class="icon-btn" id="fsUp" aria-label="הגדלת טקסט"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+      <button class="icon-btn" id="openSet" aria-label="הגדרות"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2.2"/><circle cx="10" cy="17" r="2.2"/></svg></button>
+    </div>
+    <nav class="chips" id="chips" aria-label="חלקי התפילה"></nav>
+  </div>
+
+  <header class="hero">
+    <div class="eyebrow" id="eyebrow">—</div>
+    <h1 id="h1">שחרית</h1>
+    <div class="seg" role="group" aria-label="תפילה" id="tabs">
+      <button data-p="shacharit">שחרית</button>
+      <button data-p="mincha">מנחה</button>
+      <button data-p="arvit">ערבית</button>
+    </div>
+    <p class="lvl-lbl">רמה</p>
+    <div class="seg" role="group" aria-label="רמה" id="levels">
+      <button data-l="1">מינימום<small>—</small></button>
+      <button data-l="2">רגיל<small>—</small></button>
+      <button data-l="3">מלא<small>—</small></button>
+    </div>
+  </header>
+
+  <div class="card">
+    <div class="now">
+      <div class="cd" id="cd"><svg width="92" height="92" viewBox="0 0 92 92"><circle class="trk" cx="46" cy="46" r="40" fill="none" stroke-width="7"/><circle class="val" id="cdVal" cx="46" cy="46" r="40" fill="none" stroke-width="7" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0"/></svg><div><p style="margin:0"><b id="cdNum">—</b><span id="cdUnit"></span></p></div></div>
+      <div class="now-txt"><strong id="nowTitle">—</strong><p id="nowSub">—</p></div>
+    </div>
+    <details class="z"><summary>זמני היום ברמלה<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+      <div class="ztable" id="ztable"></div>
+      <p class="znote">חישוב בקירוב, בלי התחשבות בגובה ובתוואי השטח, ולכן ייתכן הבדל של דקה או שתיים מלוח מודפס. כדאי לא לחכות לרגע האחרון. סוף זמן קריאת שמע מוצג לפי המגן אברהם וגם לפי הגר"א.</p>
+    </details>
+  </div>
+
+  <div class="card">
+    <h3><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>מה משתנה בתפילה הזו</h3>
+    <ul class="today-list" id="todayList"></ul>
+  </div>
+
+  <main id="prayers">
+{{PRAYERS}}
+  </main>
+
+  <div class="card done" id="doneCard">
+    <h3 style="justify-content:center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 12l5 5L20 6"/></svg>השבוע שלך</h3>
+    <div class="week" id="week"></div>
+    <div class="legend"><span>שחרית · מנחה · ערבית</span></div>
+    <button class="cta" id="markBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M4 12l5 5L20 6"/></svg><span>סימנתי</span></button>
+    <p class="foot" id="extraNote"></p>
+    <p class="foot">הטקסט מתוך "סידור עדות המזרח" שבאתר ספריא (Sefaria), במהדורת Shaliehsaboo. ההוראות הקצרות וההתאמות לפי התאריך נוספו כאן. בכל ספק, הסידור המודפס והרב שלך קובעים. הסימונים נשמרים רק במכשיר הזה.</p>
+  </div>
+</div>
+
+<div id="settings" hidden>
+  <div class="scrim" id="scrim"></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="setTitle">
+    <div class="grab"></div>
+    <h3 id="setTitle">הגדרות</h3>
+    <div class="row"><div><label for="swNik">ניקוד</label><small>להציג את הטקסט עם ניקוד</small></div><button class="sw" id="swNik" aria-pressed="true"></button></div>
+    <div class="row"><div><label for="swAll">כל התוספות</label><small>להציג כל תוספת עונתית עם תווית, למשל אם התאריך לא נכון</small></div><button class="sw" id="swAll" aria-pressed="false"></button></div>
+    <div class="row"><div><label>מראה</label></div>
+      <div class="seg small" id="themeSeg"><button data-th="auto">אוטומטי</button><button data-th="light">בהיר</button><button data-th="dark">כהה</button></div></div>
+  </div>
+</div>
+
+<script>
+/*{{ENGINE}}*/
+</script>
+<script>
+(function(){
+  var qs=new URLSearchParams(location.search), testNow=qs.get("t")?new Date(qs.get("t")):null;
+  var LS={get:function(k,d){try{var v=localStorage.getItem("sid_"+k);return v===null?d:JSON.parse(v);}catch(e){return d;}},set:function(k,v){try{localStorage.setItem("sid_"+k,JSON.stringify(v));}catch(e){}}};
+  var st={level:LS.get("level",1),nikud:LS.get("nikud",true),showAll:false,theme:LS.get("theme","auto"),fs:LS.get("fs",1.4)};
+  var NAMES={shacharit:"שחרית",mincha:"מנחה",arvit:"ערבית"};
+  var HM={"Tishri":"תשרי","Heshvan":"חשוון","Kislev":"כסלו","Tevet":"טבת","Shevat":"שבט","Adar I":"אדר א׳","Adar":"אדר","Adar II":"אדר ב׳","Nisan":"ניסן","Iyar":"אייר","Sivan":"סיוון","Tamuz":"תמוז","Av":"אב","Elul":"אלול"};
+  function gem(n){var H=[[400,"ת"],[300,"ש"],[200,"ר"],[100,"ק"],[90,"צ"],[80,"פ"],[70,"ע"],[60,"ס"],[50,"נ"],[40,"מ"],[30,"ל"],[20,"כ"],[10,"י"],[9,"ט"],[8,"ח"],[7,"ז"],[6,"ו"],[5,"ה"],[4,"ד"],[3,"ג"],[2,"ב"],[1,"א"]],s="";n=n%1000;
+    while(n>0){if(n===15){s+="טו";break;}if(n===16){s+="טז";break;}for(var i=0;i<H.length;i++){if(H[i][0]<=n){s+=H[i][1];n-=H[i][0];break;}}}
+    return s.length>1?s.slice(0,-1)+"״"+s.slice(-1):s+"׳";}
+  function hebStr(civil){var h=Engine.heb(civil);return gem(h.d)+" ב"+HM[h.m]+" "+gem(h.y);}
+  var $=function(id){return document.getElementById(id);};
+  var now=testNow||new Date(), ctx=Engine.context(now), prayer=LS.get("pin_"+new Date(now).toDateString(),null)||ctx.prayer, F={};
+  var pristine=$("prayers").innerHTML;
+
+  function dayFor(p){
+    var z=ctx.z, today=ctx.today, tomorrow=Engine.addDays(today,1);
+    if(p==="arvit") return now<z.alot?today:tomorrow;
+    if(p==="shacharit") return now>=z.sunset?tomorrow:today;
+    return today;
+  }
+  function evalWhen(w){
+    if(!w) return true;
+    return w.split("|").some(function(or){return or.split("&").every(function(t){return t.charAt(0)==="!"?!F[t.slice(1)]:!!F[t];});});
+  }
+  function setTheme(){if(st.theme==="auto")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",st.theme);
+    document.querySelectorAll("#themeSeg button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.th===st.theme?"true":"false");});}
+  function setFs(v){st.fs=Math.min(2.6,Math.max(1,Math.round(v*10)/10));document.documentElement.style.setProperty("--fs",st.fs+"rem");LS.set("fs",st.fs);}
+  function stripNikud(root){var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT),n;while((n=w.nextNode()))n.nodeValue=n.nodeValue.replace(/[֑-ׇ]/g,"");}
+  function renderText(){$("prayers").innerHTML=pristine;if(!st.nikud)stripNikud($("prayers"));
+    document.querySelectorAll("#prayers .t").forEach(function(p){var c=p.cloneNode(true);c.querySelectorAll(".note").forEach(function(n){n.remove();});p.dataset.w=(c.textContent.trim().split(/\s+/).filter(Boolean).length);});}
+
+  function visibleFor(el,lvl){
+    var lv=+(el.getAttribute("data-lv")||1);if(lv>lvl)return false;
+    if(st.showAll)return true;return evalWhen(el.getAttribute("data-when"));
+  }
+  function apply(){
+    F=Engine.prayerFlags(dayFor(prayer),prayer);
+    document.documentElement.classList.toggle("showall",st.showAll);
+    var root=$("p-"+prayer);
+    document.querySelectorAll(".prayer").forEach(function(p){p.hidden=p!==root;});
+    // level minutes
+    var mins=[0,0,0];
+    root.querySelectorAll(".part").forEach(function(part){
+      for(var L=1;L<=3;L++){ if(!visibleFor(part,L))continue;
+        part.querySelectorAll(".t").forEach(function(t){if(visibleFor(t,L))mins[L-1]+=(+t.dataset.w||0);});}
+    });
+    document.querySelectorAll("#levels button").forEach(function(b,i){b.setAttribute("aria-pressed",+b.dataset.l===st.level?"true":"false");b.querySelector("small").textContent="כ־"+Math.max(1,Math.round(mins[i]/115))+" דק׳";});
+    var chips=$("chips");chips.innerHTML="";
+    root.querySelectorAll(".part").forEach(function(part){
+      var on=visibleFor(part,st.level);part.hidden=!on;
+      if(!on)return;
+      part.querySelectorAll("[data-lv],[data-when]").forEach(function(el){el.hidden=!visibleFor(el,st.level);});
+      var a=document.createElement("a");a.href="#"+part.id;a.textContent=part.dataset.title;chips.appendChild(a);
+    });
+    root.querySelectorAll(".alt[data-when]").forEach(function(el){el.hidden=!(st.showAll||evalWhen(el.dataset.when));});
+    document.querySelectorAll("#tabs button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.p===prayer?"true":"false");
+      var d=b.querySelector(".now-dot");if(b.dataset.p===ctx.prayer&&!d){d=document.createElement("i");d.className="now-dot";b.appendChild(d);}});
+    $("h1").textContent=NAMES[prayer];$("barName").textContent=NAMES[prayer];
+    var day=dayFor(prayer);
+    $("eyebrow").textContent=new Intl.DateTimeFormat("he-IL",{weekday:"long"}).format(day)+" · "+hebStr(day);
+    $("barSub").dataset.total=Math.max(1,Math.round(mins[st.level-1]/115));
+    notes();countdown();progress();week();
+  }
+
+  var I_OK='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 12l5 5L20 6"/></svg>';
+  var I_W='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>';
+  function notes(){
+    var L=[],f=F;
+    if(f.shabbat||f.yt) L.push(["w",(f.shabbat?"זו תפילה של שבת":"זו תפילה של חג")+". הנוסח כאן מיועד לימי חול, ולכן צריך סידור."]);
+    if(f.av9&&prayer==="mincha") L.push(["","תשעה באב: במנחה מניחים תפילין."]);
+    if(f.av9&&prayer==="shacharit") L.push(["w","תשעה באב: בשחרית לא מניחים תפילין (מניחים במנחה), ואומרים קינות מהסידור."]);
+    if(f.chsukkot) L.push(["","חול המועד סוכות: יעלה ויבוא"+(prayer==="shacharit"?", הלל שלם ומוסף. הכול כבר בדף.":".")]);
+    if(f.chpesach) L.push(["","חול המועד פסח: יעלה ויבוא"+(prayer==="shacharit"?", חצי הלל ומוסף. הכול כבר בדף.":".")]);
+    if(f.ch&&prayer==="shacharit") L.push(["","ספרדים לא מניחים תפילין בחול המועד, ולכן סעיף התפילין מוסתר."]);
+    if(f.rc) L.push(["","ראש חודש: יעלה ויבוא"+(prayer==="shacharit"?", חצי הלל ומוסף.":".")]);
+    if(f.chanukah) L.push(["","חנוכה: על הניסים"+(prayer==="shacharit"?" והלל שלם.":".")]);
+    if(f.purim) L.push(["","פורים: על הניסים. לא לשכוח מגילה, משלוח מנות ומתנות לאביונים."]);
+    if(f.ayt) L.push(["","עשרת ימי תשובה: זכרנו לחיים, המלך הקדוש, המלך המשפט ואבינו מלכנו."]);
+    if(F.aneinu) L.push(["","יום צום: עננו בברכת שומע תפילה."]);
+    if(F.nachem) L.push(["","תשעה באב: נחם בברכת בונה ירושלים."]);
+    if(F.motzash) L.push(["","מוצאי שבת: אתה חוננתנו בברכת חונן הדעת."]);
+    if(F.omerOn) L.push(["","ספירת העומר: היום "+F.omer+" לעומר. הספירה נמצאת אחרי העמידה."]);
+    if(!(f.shabbat||f.yt)){
+      L.push(["",f.geshem?"חורף: משיב הרוח ומוריד הגשם.":"קיץ: מוריד הטל."]);
+      L.push(["",f.winter9?"ברכת השנים: ברך עלינו, עם טל ומטר.":"ברכת השנים: ברכנו."]);
+      if(prayer!=="arvit") L.push(["",F.tachanun?"אומרים תחנון (ברמה המלאה).":"לא אומרים תחנון."]);
+    }
+    if(st.showAll) L.unshift(["w","מוצגות כל התוספות, כל אחת עם תווית. אפשר לכבות את זה בהגדרות."]);
+    var ul=$("todayList");ul.innerHTML="";
+    L.forEach(function(n){var li=document.createElement("li");if(n[0])li.className="warn";li.innerHTML=(n[0]?I_W:I_OK)+"<span></span>";li.lastChild.textContent=n[1];ul.appendChild(li);});
+  }
+
+  function hm(d){return d.toLocaleTimeString("he-IL",{hour:"2-digit",minute:"2-digit",hour12:false});}
+  function countdown(){
+    var z=ctx.z, n=testNow||new Date(), target, start, title, sub, rows;
+    var zt=[["עלות השחר",z.alot],["זריחה",z.sunrise],["סוף זמן ק״ש (מג״א)",z.shemaMGA],["סוף זמן ק״ש (גר״א)",z.shemaGRA],["סוף זמן תפילה",z.tefila],["חצות היום",z.chatzot],["מנחה גדולה",z.minchaG],["פלג המנחה",z.plag],["שקיעה",z.sunset],["צאת הכוכבים",z.tzeit]];
+    var nextIdx=zt.findIndex(function(r){return r[1]>n;});
+    $("ztable").innerHTML="";
+    zt.forEach(function(r,i){var a=document.createElement("span"),b=document.createElement("span");a.textContent=r[0];b.textContent=hm(r[1]);
+      var c=r[1]<n?"past":(i===nextIdx?"next":"");if(c){a.className=c;b.className=c;}$("ztable").appendChild(a);$("ztable").appendChild(b);});
+    var sameDay=dayFor(prayer).toDateString()===ctx.today.toDateString();
+    if(prayer==="shacharit"){
+      if(!sameDay){title="שחרית של מחר";sub="זמן קריאת שמע מחר מתחיל עם עלות השחר.";target=null;}
+      else if(n<z.shemaMGA){target=z.shemaMGA;start=z.alot;title="סוף זמן קריאת שמע";sub="לפי המגן אברהם עד "+hm(z.shemaMGA)+", ולפי הגר״א עד "+hm(z.shemaGRA)+".";}
+      else if(n<z.shemaGRA){target=z.shemaGRA;start=z.shemaMGA;title="סוף זמן קריאת שמע (גר״א)";sub="זמן המגן אברהם עבר. לפי הגר״א עדיין אפשר עד "+hm(z.shemaGRA)+".";}
+      else if(n<z.tefila){target=z.tefila;start=z.shemaGRA;title="סוף זמן תפילה";sub="זמן קריאת שמע עבר. אפשר עדיין להתפלל שחרית עד "+hm(z.tefila)+".";}
+      else if(n<z.chatzot){target=z.chatzot;start=z.tefila;title="עד חצות";sub="בדיעבד אפשר להתפלל שחרית עד חצות, "+hm(z.chatzot)+", ובלי תשלומים.";}
+      else {target=null;title="זמן שחרית עבר";sub="אחרי חצות מתפללים מנחה. מי ששכח שחרית מתפלל במנחה שמונה עשרה פעמיים.";}
+    } else if(prayer==="mincha"){
+      if(n<z.minchaG){target=z.minchaG;start=z.chatzot;title="מנחה גדולה בעוד";sub="אפשר להתפלל מנחה מ־"+hm(z.minchaG)+" ועד השקיעה.";}
+      else if(n<z.sunset){target=z.sunset;start=z.minchaG;title="עד השקיעה";sub="מנחה עד "+hm(z.sunset)+". לכתחילה לא לחכות לרגע האחרון.";}
+      else {target=null;title="השקיעה עברה";sub="בדיעבד עד צאת הכוכבים, "+hm(z.tzeit)+".";}
+    } else {
+      var mid=new Date(+z.chatzot+12*36e5);
+      if(n<z.alot){target=z.alot;start=new Date(+z.alot-6*36e5);title="עד עלות השחר";sub="ערבית לכתחילה עד חצות הלילה, ובדיעבד עד עלות השחר.";}
+      else if(n<z.tzeit){target=z.tzeit;start=z.sunset;title="צאת הכוכבים בעוד";sub="ערבית מתפללים אחרי צאת הכוכבים, "+hm(z.tzeit)+".";}
+      else {target=mid;start=z.tzeit;title="עד חצות הלילה";sub="לכתחילה מתפללים ערבית עד "+hm(mid)+".";}
+    }
+    $("nowTitle").textContent=title;$("nowSub").textContent=sub;
+    var cd=$("cd"),v=$("cdVal"),C=251.33;
+    if(target){var left=target-n,tot=Math.max(1,target-start),fr=Math.max(0,Math.min(1,left/tot));v.style.strokeDashoffset=(C*(1-fr)).toFixed(1);
+      var m=Math.round(left/6e4);if(m>=60){$("cdNum").textContent=Math.floor(m/60)+":"+String(m%60).padStart(2,"0");$("cdUnit").textContent="שעות";}else{$("cdNum").textContent=m;$("cdUnit").textContent="דקות";}
+      cd.classList.toggle("warn",m<30);}
+    else{v.style.strokeDashoffset=C;$("cdNum").textContent="—";$("cdUnit").textContent="";cd.classList.remove("warn");}
+  }
+
+  var RC=119.38;
+  function progress(){
+    var root=$("p-"+prayer),r=root.getBoundingClientRect(),vh=window.innerHeight;
+    var total=Math.max(1,r.height-vh*.5),p=Math.min(1,Math.max(0,(-r.top+vh*.35)/total));
+    $("ringVal").style.strokeDashoffset=(RC*(1-p)).toFixed(2);$("ringTxt").textContent=Math.round(p*100)+"%";
+    var tot=+$("barSub").dataset.total||1,left=Math.ceil(tot*(1-p));$("barSub").textContent=p>=.99?"סיימת":"נשארו כ־"+left+" דקות";
+    var cur=null;root.querySelectorAll(".part:not([hidden])").forEach(function(s){if(s.getBoundingClientRect().top<170)cur=s.id;});
+    document.querySelectorAll("#chips a").forEach(function(a){var on=a.getAttribute("href")==="#"+cur;if(on&&!a.classList.contains("on")){try{a.scrollIntoView({block:"nearest",inline:"center"});}catch(e){}}a.classList.toggle("on",on);});
+  }
+  window.addEventListener("scroll",progress,{passive:true});
+
+  function key(d){return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate();}
+  var PK={shacharit:"s",mincha:"m",arvit:"a"};
+  function week(){
+    var log=LS.get("log",{}),w=$("week");w.innerHTML="";
+    var DN=["א׳","ב׳","ג׳","ד׳","ה׳","ו׳","ש׳"];
+    for(var i=6;i>=0;i--){
+      var d=Engine.addDays(ctx.today,-i),k=key(d),e=log[k]||{},div=document.createElement("div");div.className="wd"+(i===0?" today":"");
+      var svg='<svg width="38" height="38" viewBox="0 0 38 38">';
+      ["s","m","a"].forEach(function(p,j){var a0=-90+j*120+6,a1=a0+108,r=15;
+        function pt(a){return [19+r*Math.cos(a*Math.PI/180),19+r*Math.sin(a*Math.PI/180)];}
+        var s=pt(a0),t=pt(a1);svg+='<path class="arc'+(e[p]?" on":"")+'" d="M'+s[0].toFixed(2)+' '+s[1].toFixed(2)+' A'+r+' '+r+' 0 0 1 '+t[0].toFixed(2)+' '+t[1].toFixed(2)+'" fill="none" stroke-width="5" stroke-linecap="round"/>';});
+      svg+='</svg>';div.innerHTML=svg+"<span>"+DN[d.getDay()]+"</span>";w.appendChild(div);
+    }
+    var dk=key(dayFor(prayer)),done=!!((log[dk]||{})[PK[prayer]]);
+    $("markBtn").disabled=done;$("markBtn").lastChild.textContent=done?NAMES[prayer]+" סומנה":"סימנתי שהתפללתי "+NAMES[prayer];
+    var x="";if(F.musaf&&prayer==="shacharit")x="היום יש גם מוסף, והוא כבר בדף אחרי העמידה.";
+    $("extraNote").textContent=x;
+  }
+  $("markBtn").onclick=function(){var log=LS.get("log",{}),dk=key(dayFor(prayer));log[dk]=log[dk]||{};log[dk][PK[prayer]]=1;LS.set("log",log);week();};
+
+  // controls
+  document.querySelectorAll("#tabs button").forEach(function(b){b.onclick=function(){prayer=b.dataset.p;window.scrollTo(0,0);apply();};});
+  document.querySelectorAll("#levels button").forEach(function(b){b.onclick=function(){st.level=+b.dataset.l;LS.set("level",st.level);apply();};});
+  $("fsUp").onclick=function(){setFs(st.fs+.1);progress();};
+  $("fsDown").onclick=function(){setFs(st.fs-.1);progress();};
+  function openSet(o){$("settings").hidden=!o;}
+  $("openSet").onclick=function(){openSet(true);};$("scrim").onclick=function(){openSet(false);};
+  document.addEventListener("keydown",function(e){if(e.key==="Escape")openSet(false);});
+  function syncSw(){$("swNik").setAttribute("aria-pressed",st.nikud?"true":"false");$("swAll").setAttribute("aria-pressed",st.showAll?"true":"false");}
+  $("swNik").onclick=function(){st.nikud=!st.nikud;LS.set("nikud",st.nikud);syncSw();renderText();apply();};
+  $("swAll").onclick=function(){st.showAll=!st.showAll;syncSw();apply();};
+  document.querySelectorAll("#themeSeg button").forEach(function(b){b.onclick=function(){st.theme=b.dataset.th;LS.set("theme",st.theme);setTheme();};});
+
+  setTheme();setFs(st.fs);syncSw();renderText();apply();
+  setInterval(function(){if(!testNow){now=new Date();var c=Engine.context(now);var changed=c.prayer!==ctx.prayer;ctx=c;if(changed)apply();else countdown();}},30000);
+  if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost")){navigator.serviceWorker.register("sw.js").catch(function(){});}
+})();
+</script>
+</body>
+</html>
