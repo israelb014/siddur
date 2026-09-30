@@ -1,0 +1,11 @@
+{
+  "name": "siddur-tools",
+  "private": true,
+  "description": "Dev-only test tooling. Nothing here is shipped in the app.",
+  "scripts": {
+    "test": "node test_zmanim.mjs && node test_calendar.mjs"
+  },
+  "devDependencies": {
+    "@hebcal/core": "^5.10.1"
+  }
+}
