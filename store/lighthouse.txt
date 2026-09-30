@@ -1,0 +1,22 @@
+Lighthouse PWA audit — סידור יומי
+Lighthouse 11.7.1 (last major version with the PWA category), Chrome/141.0.0.0 headless
+URL: http://localhost:8765/siddur/ (repo served under /siddur/, same layout as GitHub Pages)
+Run: 2026-09-30T11:28:41.721Z
+
+PWA category score: 100/100
+
+[PASS]   installable-manifest   Web app manifest and service worker meet the installability requirements
+[PASS]   splash-screen          Configured for a custom splash screen
+[PASS]   themed-omnibox         Sets a theme color for the address bar.
+[PASS]   content-width          Content is sized correctly for the viewport
+[PASS]   viewport               Has a <meta name="viewport"> tag with width or initial-scale
+[PASS]   maskable-icon          Manifest has a maskable icon
+[manual] pwa-cross-browser      Site works cross-browser
+[manual] pwa-page-transitions   Page transitions don't feel like they block on the network
+[manual] pwa-each-page-has-url  Each page has a URL
+
+Chromium 141 installability API (Page.getInstallabilityErrors after service-worker activation): no errors
+Manifest parse errors (Page.getAppManifest): none
+
+[manual] items are not automatable by Lighthouse. Checked by hand: works in Chromium (the engine a TWA runs on); every page has its own URL;
+navigation is served from the service-worker cache when offline (see tools/verify_app.mjs).
