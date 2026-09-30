@@ -3,6 +3,7 @@
 import json, re, html, pathlib
 
 ROOT = pathlib.Path(__file__).parent
+VERSION = '1.0.0'  # app version shown in the About sheet; keep in sync with sw.js VERSION bumps
 SRC = ROOT / 'siddur-source.json'
 T = json.load(open(SRC))['text']
 SH, MI, AR = 'Weekday Shacharit', 'Weekday Mincha', 'Weekday Arvit'
@@ -391,6 +392,6 @@ def render_prayer(key, parts):
 prayers = '\n'.join([render_prayer('shacharit', SHACHARIT), render_prayer('mincha', MINCHA), render_prayer('arvit', ARVIT)])
 tpl = (ROOT / 'template.html').read_text(encoding='utf-8')
 engine = (ROOT / 'engine.js').read_text(encoding='utf-8')
-out = tpl.replace('{{PRAYERS}}', prayers).replace('/*{{ENGINE}}*/', engine)
+out = tpl.replace('{{PRAYERS}}', prayers).replace('/*{{ENGINE}}*/', engine).replace('{{VERSION}}', VERSION)
 (ROOT.parent / 'index.html').write_text(out, encoding='utf-8')
 print('ok', len(out))

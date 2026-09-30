@@ -143,12 +143,36 @@ details.z[open] summary svg{transform:rotate(180deg)}
 
 /* settings sheet */
 .scrim{position:fixed;inset:0;background:rgba(5,10,25,.45);z-index:40;animation:fade .2s ease both}
-.sheet{position:fixed;inset-inline:0;bottom:0;z-index:41;background:var(--surface);border-radius:24px 24px 0 0;padding:10px 20px calc(24px + env(safe-area-inset-bottom,0px));max-width:740px;margin:0 auto;animation:up .28s cubic-bezier(.2,.8,.2,1) both;box-shadow:0 -10px 40px rgba(0,0,0,.25)}
+.sheet{position:fixed;inset-inline:0;bottom:0;z-index:41;background:var(--surface);border-radius:24px 24px 0 0;padding:10px 20px calc(24px + env(safe-area-inset-bottom,0px));max-width:740px;margin:0 auto;animation:up .28s cubic-bezier(.2,.8,.2,1) both;box-shadow:0 -10px 40px rgba(0,0,0,.25);max-height:88vh;max-height:88dvh;overflow-y:auto;overscroll-behavior:contain}
+.layer.top .scrim{z-index:50} .layer.top .sheet{z-index:51}
 .grab{width:44px;height:5px;border-radius:9px;background:var(--line);margin:0 auto 14px}
 .sheet h3{margin:0 0 8px;font-size:1.2rem;font-weight:800}
 .row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}
-.row:last-of-type{border-bottom:0}
-.row label{font-weight:700}
+.row:last-child{border-bottom:0}
+.row label,.row .lbl{font-weight:700}
+.row-btn{width:100%;background:none;border:0;border-bottom:1px solid var(--line);font:inherit;text-align:start}
+.row-val{display:flex;align-items:center;gap:4px;color:var(--muted);font-weight:700;flex:none}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.sheet-head h3{margin:0}
+.search{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--line);border-radius:14px;padding:0 12px;color:var(--muted)}
+.search input{flex:1;min-width:0;border:0;background:none;font:inherit;font-size:1.05rem;color:var(--fg);padding:12px 0;outline:none}
+.city-list{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:2px}
+.city-list button{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;border:0;background:none;border-radius:12px;padding:12px 10px;font-weight:700;font-size:1.05rem;text-align:start}
+.city-list button:active{background:var(--surface2)}
+.city-list button[aria-selected="true"]{background:var(--accent-soft);color:var(--accent)}
+.city-list small{color:var(--muted);font-weight:600;font-size:.8rem;font-variant-numeric:tabular-nums}
+.empty{color:var(--muted);text-align:center;padding:18px 0;margin:0}
+.about{line-height:1.65;font-size:.97rem}
+.about .brand{display:flex;align-items:center;gap:14px;margin:4px 0 14px}
+.about .brand strong{display:block;font-family:var(--f-text);font-weight:900;font-size:1.7rem;line-height:1.1}
+.about .brand span{color:var(--muted);font-weight:700;font-size:.88rem}
+.about h4{margin:16px 0 4px;font-size:.98rem;font-weight:800}
+.about p{margin:0;color:var(--fg)}
+.about a{color:var(--accent);font-weight:700}
+.about .ltr{font-size:.84rem;color:var(--muted);font-weight:600;margin-top:4px;text-align:left}
+.search input::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none}
+.disclaimer{display:flex;gap:10px;align-items:flex-start;background:var(--cue-bg);color:var(--cue);border-radius:16px;padding:12px 14px;margin-top:16px;font-weight:700;line-height:1.55}
+.disclaimer svg{flex:none;margin-top:3px}
 .row small{display:block;color:var(--muted);font-weight:500;font-size:.84rem;margin-top:2px}
 .sw{position:relative;width:48px;height:28px;border-radius:99px;background:var(--line);border:0;flex:none;transition:background .2s}
 .sw::after{content:"";position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:transform .2s}
@@ -200,9 +224,9 @@ details.z[open] summary svg{transform:rotate(180deg)}
       <div class="cd" id="cd"><svg width="92" height="92" viewBox="0 0 92 92"><circle class="trk" cx="46" cy="46" r="40" fill="none" stroke-width="7"/><circle class="val" id="cdVal" cx="46" cy="46" r="40" fill="none" stroke-width="7" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0"/></svg><div><p style="margin:0"><b id="cdNum">—</b><span id="cdUnit"></span></p></div></div>
       <div class="now-txt"><strong id="nowTitle">—</strong><p id="nowSub">—</p></div>
     </div>
-    <details class="z"><summary>זמני היום ברמלה<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
+    <details class="z"><summary><span id="zTitle">זמני היום ברמלה</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg></summary>
       <div class="ztable" id="ztable"></div>
-      <p class="znote">חישוב בקירוב, בלי התחשבות בגובה ובתוואי השטח, ולכן ייתכן הבדל של דקה או שתיים מלוח מודפס. כדאי לא לחכות לרגע האחרון. סוף זמן קריאת שמע מוצג לפי המגן אברהם וגם לפי הגר"א.</p>
+      <p class="znote">החישוב כולל את גובה העיר מעל פני הים אבל לא את תוואי השטח, ולכן ייתכן הבדל של דקה או שתיים מלוח מודפס. כדאי לא לחכות לרגע האחרון. סוף זמן קריאת שמע מוצג לפי המגן אברהם וגם לפי הגר"א. אפשר להחליף עיר בהגדרות.</p>
     </details>
   </div>
 
@@ -763,15 +787,49 @@ details.z[open] summary svg{transform:rotate(180deg)}
   </div>
 </div>
 
-<div id="settings" hidden>
-  <div class="scrim" id="scrim"></div>
+<div class="layer" id="settings" hidden>
+  <div class="scrim" data-close></div>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="setTitle">
     <div class="grab"></div>
     <h3 id="setTitle">הגדרות</h3>
+    <button class="row row-btn" id="cityRow"><div><span class="lbl">עיר</span><small>לחישוב זמני היום</small></div><span class="row-val"><span id="cityName">רמלה</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></span></button>
     <div class="row"><div><label for="swNik">ניקוד</label><small>להציג את הטקסט עם ניקוד</small></div><button class="sw" id="swNik" aria-pressed="true"></button></div>
     <div class="row"><div><label for="swAll">כל התוספות</label><small>להציג כל תוספת עונתית עם תווית, למשל אם התאריך לא נכון</small></div><button class="sw" id="swAll" aria-pressed="false"></button></div>
+    <div class="row"><div><label for="swWake">מסך דלוק בזמן תפילה</label><small>המסך לא יכבה כל עוד התפילה פתוחה</small></div><button class="sw" id="swWake" aria-pressed="true"></button></div>
     <div class="row"><div><label>מראה</label></div>
       <div class="seg small" id="themeSeg"><button data-th="auto">אוטומטי</button><button data-th="light">בהיר</button><button data-th="dark">כהה</button></div></div>
+    <button class="row row-btn" id="aboutRow"><div><span class="lbl">אודות</span><small>מקור הטקסט, זמני היום ופרטיות</small></div><span class="row-val"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></span></button>
+  </div>
+</div>
+
+<div class="layer top" id="cityPick" hidden>
+  <div class="scrim" data-close></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="cityTitle">
+    <div class="grab"></div>
+    <div class="sheet-head"><h3 id="cityTitle">בחירת עיר</h3><button class="icon-btn" data-close aria-label="סגירה"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <label class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input id="citySearch" type="search" placeholder="חיפוש עיר" autocomplete="off" enterkeyhint="search" aria-label="חיפוש עיר"></label>
+    <ul class="city-list" id="cityList" role="listbox" aria-label="ערים"></ul>
+    <p class="empty" id="cityEmpty" hidden>לא נמצאה עיר בשם הזה</p>
+  </div>
+</div>
+
+<div class="layer top" id="aboutSheet" hidden>
+  <div class="scrim" data-close></div>
+  <div class="sheet about" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+    <div class="grab"></div>
+    <div class="sheet-head"><h3 id="aboutTitle">אודות</h3><button class="icon-btn" data-close aria-label="סגירה"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="brand"><img src="icon-192.png" width="56" height="56" alt="" style="border-radius:14px"><div><strong>סידור יומי</strong><span>גרסה <bdi id="appVer">1.0.0</bdi> · נוסח עדות המזרח</span></div></div>
+    <h4>מקור הטקסט</h4>
+    <p>נוסח התפילות לקוח מ״סידור עדות המזרח״ שבאתר ספריא, המופץ ברישיון נחלת הכלל. ההוראות הקצרות וההתאמות לפי התאריך נוספו כאן. <a href="https://www.sefaria.org/Siddur_Edot_HaMizrach" target="_blank" rel="noopener">לסידור בספריא</a></p>
+    <p class="ltr" dir="ltr">Sefaria · Siddur Edot HaMizrach · Shaliehsaboo Edition · CC0</p>
+    <h4>גופנים</h4>
+    <p>שני הגופנים כלולים באפליקציה עצמה ומופצים ברישיון גופנים פתוח (<bdi>OFL</bdi>). קובצי הרישיון המלאים:</p>
+    <p class="ltr" dir="ltr"><a href="fonts/OFL-FrankRuhlLibre.txt" target="_blank">Frank Ruhl Libre</a> · <a href="fonts/OFL-Assistant.txt" target="_blank">Assistant</a> · SIL Open Font License 1.1</p>
+    <h4>איך מחושבים זמני היום</h4>
+    <p>הזמנים מחושבים במכשיר עצמו לפי קו הרוחב, קו האורך והגובה של העיר שנבחרה (לפי אלגוריתם של <bdi>NOAA</bdi>, כולל שבירת האור והגובה). שעה זמנית לפי הגר״א היא מהזריחה עד השקיעה. עלות השחר וסוף זמן קריאת שמע של המגן אברהם מחושבים לפי 72 דקות זמניות לפני הזריחה ואחרי השקיעה. מנחה גדולה היא חצי שעה זמנית אחרי חצות, ולא פחות מ־30 דקות. צאת הכוכבים הוא 13.5 דקות זמניות אחרי השקיעה, כשיטת הרב עובדיה יוסף.</p>
+    <h4>פרטיות</h4>
+    <p>אין חשבון, אין איסוף מידע, אין פרסומות ואין שליחת נתונים. ההגדרות והסימונים נשמרים רק במכשיר הזה. <a href="privacy.html">מדיניות הפרטיות המלאה</a>.</p>
+    <div class="disclaimer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg><span>האפליקציה היא כלי עזר. בכל ספק הלכתי יש לשאול רב. זמני היום מחושבים ועשויים להיות שונים בדקה-שתיים מלוח מודפס.</span></div>
   </div>
 </div>
 
@@ -994,7 +1052,8 @@ if (typeof module !== "undefined") module.exports = Engine;
 (function(){
   var qs=new URLSearchParams(location.search), testNow=qs.get("t")?new Date(qs.get("t")):null;
   var LS={get:function(k,d){try{var v=localStorage.getItem("sid_"+k);return v===null?d:JSON.parse(v);}catch(e){return d;}},set:function(k,v){try{localStorage.setItem("sid_"+k,JSON.stringify(v));}catch(e){}}};
-  var st={level:LS.get("level",1),nikud:LS.get("nikud",true),showAll:false,theme:LS.get("theme","auto"),fs:LS.get("fs",1.4)};
+  var st={level:LS.get("level",1),nikud:LS.get("nikud",true),showAll:false,theme:LS.get("theme","auto"),fs:LS.get("fs",1.4),wake:LS.get("wake",true)};
+  var loc=Engine.city(LS.get("city","ramla"));
   var NAMES={shacharit:"שחרית",mincha:"מנחה",arvit:"ערבית"};
   var HM={"Tishri":"תשרי","Heshvan":"חשוון","Kislev":"כסלו","Tevet":"טבת","Shevat":"שבט","Adar I":"אדר א׳","Adar":"אדר","Adar II":"אדר ב׳","Nisan":"ניסן","Iyar":"אייר","Sivan":"סיוון","Tamuz":"תמוז","Av":"אב","Elul":"אלול"};
   function gem(n){var H=[[400,"ת"],[300,"ש"],[200,"ר"],[100,"ק"],[90,"צ"],[80,"פ"],[70,"ע"],[60,"ס"],[50,"נ"],[40,"מ"],[30,"ל"],[20,"כ"],[10,"י"],[9,"ט"],[8,"ח"],[7,"ז"],[6,"ו"],[5,"ה"],[4,"ד"],[3,"ג"],[2,"ב"],[1,"א"]],s="";n=n%1000;
@@ -1002,7 +1061,7 @@ if (typeof module !== "undefined") module.exports = Engine;
     return s.length>1?s.slice(0,-1)+"״"+s.slice(-1):s+"׳";}
   function hebStr(civil){var h=Engine.heb(civil);return gem(h.d)+" ב"+HM[h.m]+" "+gem(h.y);}
   var $=function(id){return document.getElementById(id);};
-  var now=testNow||new Date(), ctx=Engine.context(now), prayer=LS.get("pin_"+new Date(now).toDateString(),null)||ctx.prayer, F={};
+  var now=testNow||new Date(), ctx=Engine.context(now,loc), prayer=LS.get("pin_"+new Date(now).toDateString(),null)||ctx.prayer, F={};
   var pristine=$("prayers").innerHTML;
 
   function dayFor(p){
@@ -1153,16 +1212,39 @@ if (typeof module !== "undefined") module.exports = Engine;
   document.querySelectorAll("#levels button").forEach(function(b){b.onclick=function(){st.level=+b.dataset.l;LS.set("level",st.level);apply();};});
   $("fsUp").onclick=function(){setFs(st.fs+.1);progress();};
   $("fsDown").onclick=function(){setFs(st.fs-.1);progress();};
-  function openSet(o){$("settings").hidden=!o;}
-  $("openSet").onclick=function(){openSet(true);};$("scrim").onclick=function(){openSet(false);};
-  document.addEventListener("keydown",function(e){if(e.key==="Escape")openSet(false);});
-  function syncSw(){$("swNik").setAttribute("aria-pressed",st.nikud?"true":"false");$("swAll").setAttribute("aria-pressed",st.showAll?"true":"false");}
+  // sheets: settings, and city picker / about stacked on top of it
+  function layer(id,o){$(id).hidden=!o;}
+  document.querySelectorAll(".layer [data-close]").forEach(function(b){b.onclick=function(){layer(b.closest(".layer").id,false);};});
+  $("openSet").onclick=function(){layer("settings",true);};
+  document.addEventListener("keydown",function(e){if(e.key!=="Escape")return;var open=[].filter.call(document.querySelectorAll(".layer"),function(l){return !l.hidden;});if(open.length)layer(open[open.length-1].id,false);});
+  $("aboutRow").onclick=function(){layer("aboutSheet",true);};
+  $("cityRow").onclick=function(){$("citySearch").value="";cityList();layer("cityPick",true);};
+  function norm(x){return (x||"").toLowerCase().replace(/[\s\-־'"׳״]/g,"");}
+  function cityList(){
+    var q=norm($("citySearch").value),ul=$("cityList");ul.innerHTML="";
+    var list=Engine.CITIES.slice().sort(function(a,b){return a.name.localeCompare(b.name,"he");}).filter(function(c){return !q||norm(c.name).indexOf(q)>=0||norm(c.id).indexOf(q)>=0;});
+    list.forEach(function(c){var li=document.createElement("li"),b=document.createElement("button");b.setAttribute("role","option");b.setAttribute("aria-selected",c.id===loc.id?"true":"false");
+      b.innerHTML="<span></span><span class=\"row-val\"><small></small>"+(c.id===loc.id?I_OK:"")+"</span>";b.firstChild.textContent=c.name;b.querySelector("small").textContent="גובה "+Math.max(0,c.elev)+" מ׳";
+      b.onclick=function(){setCity(c.id);layer("cityPick",false);};li.appendChild(b);ul.appendChild(li);});
+    $("cityEmpty").hidden=list.length>0;
+  }
+  $("citySearch").addEventListener("input",cityList);
+  function setCity(id){loc=Engine.city(id);LS.set("city",loc.id);syncCity();ctx=Engine.context(now,loc);apply();}
+  function syncCity(){$("cityName").textContent=loc.name;$("zTitle").textContent="זמני היום ב"+loc.name;}
+  // keep the screen on while the prayer is open (silently ignored where unsupported)
+  var wl=null;
+  function wake(){if(!st.wake||wl||document.visibilityState!=="visible"||!("wakeLock" in navigator))return;
+    try{navigator.wakeLock.request("screen").then(function(l){wl=l;l.addEventListener("release",function(){wl=null;});}).catch(function(){});}catch(e){}}
+  function unwake(){if(wl){try{wl.release().catch(function(){});}catch(e){}wl=null;}}
+  document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible")wake();});
+  $("swWake").onclick=function(){st.wake=!st.wake;LS.set("wake",st.wake);syncSw();if(st.wake)wake();else unwake();};
+  function syncSw(){$("swNik").setAttribute("aria-pressed",st.nikud?"true":"false");$("swAll").setAttribute("aria-pressed",st.showAll?"true":"false");$("swWake").setAttribute("aria-pressed",st.wake?"true":"false");}
   $("swNik").onclick=function(){st.nikud=!st.nikud;LS.set("nikud",st.nikud);syncSw();renderText();apply();};
   $("swAll").onclick=function(){st.showAll=!st.showAll;syncSw();apply();};
   document.querySelectorAll("#themeSeg button").forEach(function(b){b.onclick=function(){st.theme=b.dataset.th;LS.set("theme",st.theme);setTheme();};});
 
-  setTheme();setFs(st.fs);syncSw();renderText();apply();
-  setInterval(function(){if(!testNow){now=new Date();var c=Engine.context(now);var changed=c.prayer!==ctx.prayer;ctx=c;if(changed)apply();else countdown();}},30000);
+  setTheme();setFs(st.fs);syncSw();syncCity();renderText();apply();wake();
+  setInterval(function(){if(!testNow){now=new Date();var c=Engine.context(now,loc);var changed=c.prayer!==ctx.prayer;ctx=c;if(changed)apply();else countdown();}},30000);
   if("serviceWorker" in navigator&&(location.protocol==="https:"||location.hostname==="localhost")){navigator.serviceWorker.register("sw.js").catch(function(){});}
 })();
 </script>
