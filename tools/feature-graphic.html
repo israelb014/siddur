@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Feature graphic 1024x500</title>
+<!-- Source for store/feature-graphic.png (rendered by store_assets.mjs at exactly 1024x500). -->
+<style>
+@font-face{font-family:'Frank Ruhl Libre';font-weight:300 900;src:url(../fonts/frank-ruhl-libre-hebrew.woff2) format('woff2');unicode-range:U+0590-05FF,U+200C-2010,U+FB1D-FB4F}
+@font-face{font-family:'Assistant';font-weight:200 800;src:url(../fonts/assistant-hebrew.woff2) format('woff2');unicode-range:U+0590-05FF,U+200C-2010,U+FB1D-FB4F}
+@font-face{font-family:'Assistant';font-weight:200 800;src:url(../fonts/assistant-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+2000-206F}
+*{box-sizing:border-box}
+html,body{margin:0;width:1024px;height:500px;overflow:hidden}
+body{position:relative;background:#0c1222;color:#f6efe3;font-family:"Assistant",sans-serif;
+  background-image:
+    radial-gradient(55% 75% at 30% -12%,rgba(255,170,90,.55),transparent 70%),
+    radial-gradient(40% 60% at 100% 110%,rgba(90,130,255,.28),transparent 70%),
+    linear-gradient(180deg,#131c36 0%,#0c1222 70%)}
+.stars{position:absolute;inset:0;opacity:.5;background-image:
+  radial-gradient(1.5px 1.5px at 12% 70%,#fff,transparent),radial-gradient(1px 1px at 22% 85%,#fff,transparent),
+  radial-gradient(1.2px 1.2px at 8% 40%,#fff,transparent),radial-gradient(1px 1px at 92% 18%,#fff,transparent),
+  radial-gradient(1.4px 1.4px at 80% 8%,#fff,transparent),radial-gradient(1px 1px at 62% 90%,#fff,transparent)}
+.mark{position:absolute;left:92px;top:50%;width:300px;height:300px;transform:translateY(-50%)}
+.mark svg{position:absolute;inset:0}
+.mark .shin{position:absolute;inset:0;display:grid;place-items:center;font-family:"Frank Ruhl Libre",serif;font-weight:900;font-size:150px;line-height:1;color:#f6efe3;padding-top:14px}
+.halo{position:absolute;left:52px;top:50%;width:380px;height:380px;transform:translateY(-50%);border-radius:50%;background:radial-gradient(circle,rgba(146,180,255,.18),transparent 65%)}
+.copy{position:absolute;right:88px;top:50%;transform:translateY(-50%);text-align:right;max-width:500px}
+h1{margin:0;font-family:"Frank Ruhl Libre",serif;font-weight:900;font-size:112px;line-height:1;letter-spacing:-.01em}
+p{margin:22px 0 0;font-size:34px;font-weight:700;color:#c9d4f0;line-height:1.3}
+.rule{width:84px;height:5px;border-radius:5px;background:#92b4ff;margin:26px 0 0 auto}
+</style>
+</head>
+<body>
+<div class="stars"></div>
+<div class="halo"></div>
+<div class="mark" aria-hidden="true">
+  <svg width="300" height="300" viewBox="0 0 300 300">
+    <circle cx="150" cy="150" r="128" fill="none" stroke="rgba(255,255,255,.13)" stroke-width="16"/>
+    <circle cx="150" cy="150" r="128" fill="none" stroke="#92b4ff" stroke-width="16" stroke-linecap="round" stroke-dasharray="804.25" stroke-dashoffset="190" transform="rotate(-90 150 150)"/>
+  </svg>
+  <div class="shin">ש</div>
+</div>
+<div class="copy">
+  <h1>סידור יומי</h1>
+  <div class="rule"></div>
+  <p>התפילה מתאימה את עצמה ליום</p>
+</div>
+</body>
+</html>
